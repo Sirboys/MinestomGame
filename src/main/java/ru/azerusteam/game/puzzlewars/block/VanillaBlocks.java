@@ -38,8 +38,8 @@ public enum VanillaBlocks {
     CRIMSON_WALL_SIGN(() -> new SignBlock(Block.CRIMSON_WALL_SIGN)),
     CRIMSON_SIGN(() -> new SignBlock(Block.CRIMSON_SIGN)),
     WARPED_WALL_SIGN(() -> new SignBlock(Block.WARPED_WALL_SIGN)),
-    WARPED_SIGN(() -> new SignBlock(Block.WARPED_SIGN));
-
+    WARPED_SIGN(() -> new SignBlock(Block.WARPED_SIGN)),
+    CHEST(ChestBlock::new);
     //SAND(() -> new GravityBlock(Block.SAND)),
   //  RED_SAND(() -> new GravityBlock(Block.RED_SAND)),
 //    GRAVEL(() -> new GravityBlock(Block.GRAVEL)),
@@ -77,7 +77,6 @@ public enum VanillaBlocks {
                 }
             });
         });*/
-        System.out.println(block.getCustomBlockId());
         blockManager.registerCustomBlock(block);
 
         if (placementRule != null) {

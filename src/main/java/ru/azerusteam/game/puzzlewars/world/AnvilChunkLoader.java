@@ -1,6 +1,5 @@
 package ru.azerusteam.game.puzzlewars.world;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -11,8 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.jglrxavpok.hephaistos.mca.*;
-import org.jglrxavpok.hephaistos.nbt.NBT;
+import org.jglrxavpok.hephaistos.mca.AnvilException;
+import org.jglrxavpok.hephaistos.mca.ChunkColumn;
+import org.jglrxavpok.hephaistos.mca.CoordinatesKt;
+import org.jglrxavpok.hephaistos.mca.RegionFile;
 import org.jglrxavpok.hephaistos.nbt.NBTCompound;
 import org.jglrxavpok.hephaistos.nbt.NBTList;
 import org.jglrxavpok.hephaistos.nbt.NBTTypes;
@@ -36,7 +37,6 @@ import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.utils.chunk.ChunkCallback;
 import net.minestom.server.utils.chunk.ChunkUtils;
 import net.minestom.server.world.biomes.Biome;
-import ru.azerusteam.game.puzzlewars.block.SignBlock;
 import ru.azerusteam.game.puzzlewars.block.VanillaBlock;
 
 public class AnvilChunkLoader implements IChunkLoader {
@@ -123,48 +123,22 @@ public class AnvilChunkLoader implements IChunkLoader {
 
     private void loadTileEntities(Chunk loadedChunk, int chunkX, int chunkZ, Instance instance, ChunkColumn fileChunk) {
         BlockPosition pos = new BlockPosition(0, 0, 0);
-        for (NBTCompound tileEntity : fileChunk.getTileEntities()) {
-            // String tileEntityID = te.getString("id");
-            if (tileEntity == null) continue;
-            Integer teX = tileEntity.getInt("x");
-            Integer teY = tileEntity.getInt("y");
-            Integer teZ = tileEntity.getInt("z");
-            if (teX == null || teY == null || teZ == null) continue;
-            int x = teX + chunkX * 16;
-            int y = teY;
-            int z = teZ + chunkZ * 16;
-            pos.setX(x);
-            pos.setY(y);
-            pos.setZ(z);
-            /*keys.forEach(s -> {
-                NBT nbt = tileEntities.get(s);
-                blockData.set(key, nbt.;)
-            });*/
-            Data data = loadedChunk.getBlockData(ChunkUtils.getBlockIndex(x, y, z));
+        for (NBTCompound te : fileChunk.getTileEntities()) {
+            String tileEntityID = te.getString("id");
+            int x = te.getInt("x") + chunkX * 16;
+            int y = te.getInt("y");
+            int z = te.getInt("z") + chunkZ * 16;
             CustomBlock block = loadedChunk.getCustomBlock(x, y, z);
-
-            if (block == null) {
-                System.out.println("Null Tile: " + loadedChunk.getCustomBlockId(x, y, z));
-                continue;
-            }
-            if (block instanceof SignBlock) {
-                System.out.println("Sign found");
-            }
-            if (!(block instanceof VanillaBlock)) {
-                continue;
-            }
-            data = ((VanillaBlock) block).readBlockEntity(tileEntity, instance, pos, data);
-            loadedChunk.setBlockData(x, y, z, data);
-            //
-            //loadedChunk.setBlockData(x, y, z, );
-            /*if (block != null && block instanceof VanillaBlock) {
+            if (block instanceof VanillaBlock) {
+                System.out.println("Found handled TE " + block.getIdentifier());
                 pos.setX(x);
                 pos.setY(y);
                 pos.setZ(z);
                 Data data = loadedChunk.getBlockData(ChunkUtils.getBlockIndex(x, y, z));
                 data = ((VanillaBlock) block).readBlockEntity(te, instance, pos, data);
                 loadedChunk.setBlockData(x, y, z, data);
-            }*/
+
+            }
         }
     }
 
@@ -173,17 +147,17 @@ public class AnvilChunkLoader implements IChunkLoader {
             for (int z = 0; z < Chunk.CHUNK_SIZE_Z; z++) {
                 for (int y = 0; y < Chunk.CHUNK_SIZE_Y; y++) {
                     try {
-                        BlockState blockState = fileChunk.getBlockState(x, y, z);
+                        org.jglrxavpok.hephaistos.mca.BlockState blockState = fileChunk.getBlockState(x, y, z);
                         Block rBlock = Registries.getBlock(blockState.getName());
 
                         short customBlockId = 0;
                         Data data = null;
                         CustomBlock customBlock = MinecraftServer.getBlockManager().getCustomBlock(rBlock.getBlockId());
-                        /*if (customBlock != null && customBlock instanceof VanillaBlock) {
+                        if (customBlock != null && customBlock instanceof VanillaBlock) {
                             customBlockId = rBlock.getBlockId();
 
                             data = customBlock.createData(instance, new BlockPosition(x + chunkX * 16, y, z + chunkZ * 16), null);
-                        }*/
+                        }
                         if (!blockState.getProperties().isEmpty()) {
                             List<String> propertiesArray = new ArrayList<>();
                             blockState.getProperties().forEach((key, value2) -> {
@@ -204,6 +178,7 @@ public class AnvilChunkLoader implements IChunkLoader {
                                 batch.setBlock(x, y, z, rBlock);
                             }
                         }
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -285,7 +260,7 @@ public class AnvilChunkLoader implements IChunkLoader {
             position.setY(y);
             position.setZ(z);
             CustomBlock customBlock = chunk.getCustomBlock(x, y, z);
-            /*if (customBlock instanceof VanillaBlock) {
+            if (customBlock instanceof VanillaBlock) {
                 NBTCompound nbt = new NBTCompound();
                 nbt.setInt("x", x);
                 nbt.setInt("y", y);
@@ -300,7 +275,7 @@ public class AnvilChunkLoader implements IChunkLoader {
                 } else {
                     LOGGER.warn("Tried to save block entity for a block which is not a block entity? Block is {} at {},{},{}", customBlock, x, y, z);
                 }
-            }*/
+            }
         }
         fileChunk.setTileEntities(tileEntities);
     }

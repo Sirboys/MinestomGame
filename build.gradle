@@ -31,8 +31,8 @@ sourceSets {
 
 repositories {
     mavenCentral()
-    maven { url 'http://repo.spongepowered.org/maven' }
     maven { url 'https://libraries.minecraft.net/' }
+    maven { url 'http://repo.spongepowered.org/maven' }
     maven { url 'https://jitpack.io' }
 }
 
@@ -40,7 +40,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
     //api project(":Minestom")
-    api("com.github.Minestom:Minestom:501ed1f0b2")
+    api("com.github.Minestom:Minestom:-SNAPSHOT")
     implementation(project(":Minestom")) {
         capabilities {
             requireCapability("net.minestom.server:Minestom-generators")
@@ -53,5 +53,14 @@ dependencies {
         }
     }
 }
+jar {
+    manifest {
+        attributes "Main-Class": "ru.azerusteam.game.puzzlewars.GameServer"
 
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
 compileJava.options.encoding = 'UTF-8'
