@@ -39,6 +39,8 @@ public enum VanillaBlocks {
     CRIMSON_SIGN(() -> new SignBlock(Block.CRIMSON_SIGN)),
     WARPED_WALL_SIGN(() -> new SignBlock(Block.WARPED_WALL_SIGN)),
     WARPED_SIGN(() -> new SignBlock(Block.WARPED_SIGN)),
+    PLAYER_HEAD(() -> new PlayerHeadBlock(Block.PLAYER_HEAD)),
+    PLAYER_WALL_HEAD(() -> new PlayerHeadBlock(Block.PLAYER_WALL_HEAD)),
     CHEST(ChestBlock::new);
     //SAND(() -> new GravityBlock(Block.SAND)),
   //  RED_SAND(() -> new GravityBlock(Block.RED_SAND)),

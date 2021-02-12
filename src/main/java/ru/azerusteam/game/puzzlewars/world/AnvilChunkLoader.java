@@ -130,7 +130,6 @@ public class AnvilChunkLoader implements IChunkLoader {
             int z = te.getInt("z") + chunkZ * 16;
             CustomBlock block = loadedChunk.getCustomBlock(x, y, z);
             if (block instanceof VanillaBlock) {
-                System.out.println("Found handled TE " + block.getIdentifier());
                 pos.setX(x);
                 pos.setY(y);
                 pos.setZ(z);

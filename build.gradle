@@ -1,17 +1,18 @@
 plugins {
-    id 'java-library'
+    id 'java'
+    id "com.github.johnrengelman.shadow" version "6.1.0"
 }
 
 group 'ru.azerusteam.game.puzzlewars'
 version '1.0'
 
 sourceCompatibility = 1.11
-
+/*
 java {
     withSourcesJar()
     withJavadocJar()
-}
-
+}*/
+/*
 sourceSets {
     main {
         java {
@@ -27,40 +28,48 @@ sourceSets {
         compileClasspath += sourceSets.main.runtimeClasspath
         runtimeClasspath += sourceSets.main.runtimeClasspath
     }
-}
+}*/
 
 repositories {
     mavenCentral()
     maven { url 'https://libraries.minecraft.net/' }
-    maven { url 'http://repo.spongepowered.org/maven' }
     maven { url 'https://jitpack.io' }
+    maven { url 'http://repo.spongepowered.org/maven' }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
     //api project(":Minestom")
-    api("com.github.Minestom:Minestom:-SNAPSHOT")
-    implementation(project(":Minestom")) {
-        capabilities {
-            requireCapability("net.minestom.server:Minestom-generators")
-        }
-    }
-    api("com.github.jglrxavpok:Hephaistos:${project.hephaistos_version}:gson")
-    api("com.github.jglrxavpok:Hephaistos:${project.hephaistos_version}") {
+    compile("com.github.Minestom:Minestom:da3a8b17b2")
+    compile("com.github.sejtam10:MineStom-Entities:master-SNAPSHOT")
+    compile("com.github.jglrxavpok:Hephaistos:${project.hephaistos_version}:gson")
+    compile("com.github.jglrxavpok:Hephaistos:${project.hephaistos_version}") {
         capabilities {
             requireCapability("org.jglrxavpok.nbt:Hephaistos-gson")
         }
     }
+    compile files("D:\\Spigots\\mysql-connector-java-8.0.23.jar")
 }
 jar {
     manifest {
-        attributes "Main-Class": "ru.azerusteam.game.puzzlewars.GameServer"
+        attributes 'Main-Class': 'ru.azerusteam.game.puzzlewars.GameServer', 'Multi-Release': true
 
     }
-
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude "META-INF/*.RSA"
+    }
+    doLast {
+        copy {
+            from "$buildDir/libs/MineStomGame-1.0.jar"
+            into "$projectDir/run/"
+        }
     }
 }
 compileJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
